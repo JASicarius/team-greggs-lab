@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Team Greggs Lab: Visual Test</title>
+        <style>
+            html, body {
+                margin: 0;
+                height: 100%;
+            }
+            body {
+                background: red;
+                transition: background-colour 0.3s ease;
+                cursor: pointer;
+                user-select: none;
+                -webkit-tap-highlight-color: transparent;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: system-ui, sans-serif;
+                color: white;
+            }
+            p {
+                font-size: 1.25rem;
+                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4)
+            }
+        </style>
+    </head>
+    <body>
+        <p>Click anywhere to cycle through sample colours (and let me know if they're okay!)</p>
+        <script>
+            const colours = ["red", "blue", "green", "hotpink"];
+            let index = 0;
+
+            document.addEventListener("click", () => {
+                index = (index + 1) % colours.length;
+                document.body.style.backgroundColor = colours[index];
+            });
+            </script>
+    </body>
+</html>
