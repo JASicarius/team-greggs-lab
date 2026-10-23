@@ -10,8 +10,7 @@
                 height: 100%;
             }
             body {
-                background: red;
-                transition: background-colour 0.3s ease;
+                background: white;
                 cursor: pointer;
                 user-select: none;
                 -webkit-tap-highlight-color: transparent;
@@ -19,6 +18,19 @@
                 align-items: center;
                 justify-content: center;
                 font-family: system-ui, sans-serif;
+            }
+
+            #square {
+                width: min(70vw, 70vh);
+                aspect-ratio: 1;
+                background: pink;
+                transition: background-color 0.3s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                padding: 1rem;
+                box-sizing: border-box;
                 color: white;
             }
             p {
@@ -28,14 +40,15 @@
         </style>
     </head>
     <body>
-        <p>Click anywhere to cycle through sample colours (and let me know if they're okay!)</p>
+        <p>Click anywhere within the square cycle through sample colours (and let me know if they're okay!)</p>
         <script>
-            const colours = ["red", "blue", "green", "hotpink"];
+            const colours = ["hotpink", "red", "green", "blue"];
+            const square = document.getElementById("square");
             let index = 0;
 
-            document.addEventListener("click", () => {
+            square.addEventListener("click", () => {
                 index = (index + 1) % colours.length;
-                document.body.style.backgroundColor = colours[index];
+                square.style.backgroundColor = colours[index];
             });
             </script>
     </body>
