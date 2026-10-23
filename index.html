@@ -41,12 +41,13 @@
     </head>
     <body>
         <div id="square">
-        <p>Click anywhere within the square cycle through sample colours (and let me know if they're okay!)</p>
+        <p>Click anywhere within the square when you see a colour change.</p>
         </div>
         <script>
             const colours = ["hotpink", "red", "green", "blue"];
             const square = document.getElementById("square");
             let current = 0;
+            let waiting = false;
 
             function changeColour () {
                 let next;
@@ -59,14 +60,18 @@
             }
 
             function scheduleNext() {
+                waiting = true;
                 const delay = 500 + Math.random() * 3000;
                 setTimeout(() => {
                     changeColour();
-                    scheduleNext();
+                    waiting = false;
                 }, delay);
             }
 
-scheduleNext();
+            square.addEventListener("click", () => {
+                if (waiting) return; // Added this so that clicks are ignored if scheduleNext has already been called so spam-clicking doesn't queue a bunch of changes.
+                scheduleNext();
+            })
 
             </script>
     </body>
