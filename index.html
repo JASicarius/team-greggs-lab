@@ -10,7 +10,7 @@
                 height: 100%;
             }
             body {
-                background: white;
+                background: gray;
                 cursor: pointer;
                 user-select: none;
                 -webkit-tap-highlight-color: transparent;
@@ -23,7 +23,7 @@
             #square {
                 width: min(70vw, 70vh);
                 aspect-ratio: 1;
-                background: pink;
+                background: hotpink;
                 transition: background-color 0.3s ease;
                 display: flex;
                 align-items: center;
@@ -46,12 +46,28 @@
         <script>
             const colours = ["hotpink", "red", "green", "blue"];
             const square = document.getElementById("square");
-            let index = 0;
+            let current = 0;
 
-            square.addEventListener("click", () => {
-                index = (index + 1) % colours.length;
-                square.style.backgroundColor = colours[index];
-            });
+            function changeColour () {
+                let next;
+                do {
+                    next = Math.floor(Math.random() * colours.length);
+                } while (next === current); // This should make it so the colours are random but never repeat consecutively so we get better data.
+
+                current = next;
+                square.style.backgroundColor = colours[current];
+            }
+
+            function scheduleNext() {
+                const delay = 500 + Math.random() * 3000;
+                setTimeout(() => {
+                    changeColour();
+                    scheduleNext();
+                }, delay);
+            }
+
+scheduleNext();
+
             </script>
     </body>
 </html>
