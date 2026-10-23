@@ -11,19 +11,23 @@
             }
             body {
                 background: skyblue;
-                cursor: pointer;
                 user-select: none;
                 -webkit-tap-highlight-color: transparent;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 font-family: system-ui, sans-serif;
+                gap: 3rem;
+                padding: 2rem;
+                box-sizing: border-box;
+                flex-wrap: wrap;
             }
 
             #square {
                 width: min(70vw, 70vh);
                 aspect-ratio: 1;
                 background: dimgray;
+                cursor: pointer;
                 transition: background-color 0.3s ease;
                 display: flex;
                 align-items: center;
@@ -32,14 +36,31 @@
                 padding: 1rem;
                 box-sizing: border-box;
                 color: white;
+                border: 3px solid black;
             }
-            p {
+
+            #info {
+                max-width: 22rem;
+                color: #222;
+                line-height: 1.5;
+                border: 3px solid black;
+                padding: 1.5rem;
+            }
+
+            #message {
                 font-size: 1.25rem;
-                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4)
+                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
             }
         </style>
     </head>
     <body>
+        <aside id="info">
+            <h2>"Team Greggs Reaction-Time Experiment"</h2>
+            <p>Within this experiment we're measuring reaction-time to various colour changes to determine if colour impacts reaction speed.</p>
+            <p>To the right you'll start the experiment by clicking on the large square, and click again each time the colour changes (a total of 20 times).</p>
+            <p>Once you've completed all 20 cycles you'll be able to view and export your average results per colour.</p>
+        </aside>
+
         <div id="square">
         <p id="message">Click anywhere within the square to begin the Reaction Time Test.</p>
         </div>
@@ -63,7 +84,7 @@
                     }
                     shuffle(list);
                 } while (hasRepeats(list)); // Added this to re-shuffle the list if two colours appear consecutively.
-                return list
+                return list;
             }
 
             function shuffle(list) {
@@ -75,7 +96,7 @@
 
             function hasRepeats(list) {
                 for (let i = 1; i < list.length; i++) {
-                    if (list[i] === list[i - 1]) return true; // Added this to compare each value with the one before it in the shuffled list. buildSequence uses this to determine if it needs to re
+                    if (list[i] === list[i - 1]) return true; // Added this to compare each value with the one before it in the shuffled list. buildSequence uses this to determine if it needs to re-shuffle.
                 }
                 return false;
             }
@@ -101,7 +122,7 @@
                 if (!started) {
                     started = true;
                     sequence = buildSequence();
-                    message.textContent = "Click anywhere within the square when you see a colour change."
+                    message.textContent = "Click anywhere within the square when you see a colour change.";
                 } else if (step === sequence.length) {
                     finished = true;
                     square.style.backgroundColor = "dimgray";
