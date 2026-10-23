@@ -10,7 +10,7 @@
                 height: 100%;
             }
             body {
-                background: gray;
+                background: skyblue;
                 cursor: pointer;
                 user-select: none;
                 -webkit-tap-highlight-color: transparent;
@@ -23,7 +23,7 @@
             #square {
                 width: min(70vw, 70vh);
                 aspect-ratio: 1;
-                background: white;
+                background: dimgray;
                 transition: background-color 0.3s ease;
                 display: flex;
                 align-items: center;
@@ -47,18 +47,43 @@
             const colours = ["hotpink", "red", "green", "blue"];
             const square = document.getElementById("square");
             const message = document.getElementById("message");
-            let current = -1;
             let waiting = false;
             let started = false;
+            const REPEATS = 5;
+            let sequence = [];
+            let step = 0;
+            let finished = false;
+
+            function buildSequence() {
+                let list;
+                do {
+                    list = [];
+                    for (const colour of colours) {
+                        for (let i = 0; i < REPEATS; i ++) list.push(colour);
+                    }
+                    shuffle(list);
+                } while (hasRepeats(list)); // Added this to re-shuffle the list if two colours appear consecutively.
+                return list
+            }
+
+            function shuffle(list) {
+                for (let i = list.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [list[i], list[j]] = [list[j], list[i]];
+                }
+            }
+
+            function hasRepeats(list) {
+                for (let i = 1; i < list.length; i++) {
+                    if (list[i] === list[i - 1]) return true; // Added this to compare each value with the one before it in the shuffled list. buildSequence uses this to determine if it needs to re
+                }
+                return false;
+            }
 
             function changeColour () {
-                let next;
-                do {
-                    next = Math.floor(Math.random() * colours.length);
-                } while (next === current); // This should make it so the colours are random but never repeat consecutively so we get better data.
 
-                current = next;
-                square.style.backgroundColor = colours[current];
+                square.style.backgroundColor = sequence[step];
+                step++;
             }
 
             function scheduleNext() {
@@ -71,11 +96,17 @@
             }
 
             square.addEventListener("click", () => {
-                if (waiting) return; // Added this so that clicks are ignored if scheduleNext has already been called so spam-clicking doesn't queue a bunch of changes.
+                if (waiting || finished) return; // Added this so that clicks are ignored if scheduleNext has already been called so spam-clicking doesn't queue a bunch of changes.
 
                 if (!started) {
                     started = true;
+                    sequence = buildSequence();
                     message.textContent = "Click anywhere within the square when you see a colour change."
+                } else if (step === sequence.length) {
+                    finished = true;
+                    square.style.backgroundColor = "dimgray";
+                    message.textContent = "Thanks for taking Team Greggs' reaction time test!";
+                    return;
                 }
 
                 scheduleNext();
