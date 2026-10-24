@@ -73,7 +73,6 @@
                 margin: 0;
             }
 
-
             .swatch {
                 width: 1rem;
                 height: 1rem;
@@ -197,6 +196,15 @@
                 }, delay);
             }
 
+            function averageFor(colour) {
+                const times = results
+                    .filter(r => r.colour === colour)
+                    .map(r => r.time);
+
+                if (times.length === 0) return null;
+                return times.reduce((sum, t) => sum + t, 0) / times.length;
+            }
+
             function renderResults() {
                 let html = "";
 
@@ -214,7 +222,7 @@
                     }
 
                     if (finished && times.length > 0) {
-                        const average = times.reduce((sum, t) => sum + t, 0) / times.length;
+                        const average = averageFor(colour);
                         html += `<p><strong>Average: ${Math.round(average)} ms</strong></p>`;
                     }
                 }
@@ -228,6 +236,13 @@
                 results.forEach((r, i) => {
                     rows.push([i+1, r.colour, r.time.toFixed(1)]);
                 });
+
+                rows.push([]);
+                rows.push(["Colour", "Average Reaction Time (ms)"]);
+
+                for (const colour of colours) {
+                    rows.push([colour, averageFor(colour).toFixed(1)]); // Added this to round it to one decimal place. Done the same to each individual score above.
+                }
 
                 const csv = rows.map(row => row.join(",")).join("\n");
 
@@ -265,8 +280,8 @@
                         square.style.backgroundColor = "dimgray";
                         message.textContent = "Thanks for taking Team Greggs' reaction time test!";
                         return;
+                    }
                 }
-            }
 
                 scheduleNext();
             });
