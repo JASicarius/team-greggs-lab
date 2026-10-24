@@ -28,7 +28,6 @@
                 aspect-ratio: 1;
                 background: dimgray;
                 cursor: pointer;
-                transition: background-color 0.3s ease;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -47,6 +46,20 @@
                 padding: 1.5rem;
             }
 
+            #test-space {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            #feedback {
+                margin: 0;
+                font-size: 1.25rem;
+                color: #222;
+                min-height: 1.5em;
+            }
+
             #message {
                 font-size: 1.25rem;
                 text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
@@ -55,25 +68,31 @@
     </head>
     <body>
         <aside id="info">
-            <h2>"Team Greggs Reaction-Time Experiment"</h2>
+            <h2>Team Greggs Reaction-Time Experiment</h2>
             <p>Within this experiment we're measuring reaction-time to various colour changes to determine if colour impacts reaction speed.</p>
             <p>To the right you'll start the experiment by clicking on the large square, and click again each time the colour changes (a total of 20 times).</p>
             <p>Once you've completed all 20 cycles you'll be able to view and export your average results per colour.</p>
         </aside>
 
-        <div id="square">
-        <p id="message">Click anywhere within the square to begin the Reaction Time Test.</p>
+        <div id="test-space">
+            <div id="square">
+                <p id="message">Click anywhere within the square to begin the Reaction Time Test.</p>
+            </div>
+            <p id="feedback"></p>
         </div>
         <script>
             const colours = ["hotpink", "red", "green", "blue"];
             const square = document.getElementById("square");
             const message = document.getElementById("message");
+            const feedback = document.getElementById("feedback");
+            const REPEATS = 5;
             let waiting = false;
             let started = false;
-            const REPEATS = 5;
             let sequence = [];
             let step = 0;
             let finished = false;
+            let colourShownAt = 0;
+            let results = [];
 
             function buildSequence() {
                 let list;
@@ -102,9 +121,20 @@
             }
 
             function changeColour () {
-
                 square.style.backgroundColor = sequence[step];
                 step++;
+                colourShownAt = performance.now();
+            }
+
+            function pulse() {
+                square.animate(
+                    [
+                        { transform: "scale(1)" },
+                        { transform: "scale(0.95)" },
+                        { transform: "scale(1)" },
+                    ],
+                    { duration: 150 } // Added this for better visual feedback upon click.
+                );
             }
 
             function scheduleNext() {
@@ -123,12 +153,19 @@
                     started = true;
                     sequence = buildSequence();
                     message.textContent = "Click anywhere within the square when you see a colour change.";
-                } else if (step === sequence.length) {
+                } else {
+                    const reactionTime = performance.now() - colourShownAt;
+                    results.push({ colour: sequence[step-1], time: reactionTime });
+                    feedback.textContent = `Reaction Time: ${Math.round(reactionTime)} ms`;
+                    pulse();
+                
+                    if (step === sequence.length) {
                     finished = true;
                     square.style.backgroundColor = "dimgray";
                     message.textContent = "Thanks for taking Team Greggs' reaction time test!";
                     return;
                 }
+            }
 
                 scheduleNext();
             });
