@@ -24,7 +24,7 @@
             }
 
             #square {
-                width: min(70vw, 70vh);
+                width: min(50vw, 60vh);
                 aspect-ratio: 1;
                 background: dimgray;
                 cursor: pointer;
@@ -51,6 +51,33 @@
                 flex-direction: column;
                 align-items: center;
                 gap: 1rem;
+            }
+
+            #results {
+                max-width: 22rem;
+                color: #222;
+                line-height: 1.5;
+                border: 3px solid black;
+                padding: 1.5rem;
+            }
+
+            #results h3 {
+                margin: 1rem 0 0.25rem;
+                text-transform: capitalize;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            #results p {
+                margin: 0;
+            }
+
+
+            .swatch {
+                width: 1rem;
+                height: 1rem;
+                border: 2px solid black;
             }
 
             #feedback {
@@ -80,11 +107,18 @@
             </div>
             <p id="feedback"></p>
         </div>
+
+        <aside id="results">
+            <h2>Results by Colour</h2>
+            <div id="results-list"></div>
+        </aside>
+
         <script>
             const colours = ["hotpink", "red", "green", "blue"];
             const square = document.getElementById("square");
             const message = document.getElementById("message");
             const feedback = document.getElementById("feedback");
+            const resultsList = document.getElementById("results-list");
             const REPEATS = 5;
             let waiting = false;
             let started = false;
@@ -146,6 +180,31 @@
                 }, delay);
             }
 
+            function renderResults() {
+                let html = "";
+
+                for (const colour of colours) {
+                    const times = results
+                    .filter(r => r.colour === colour)
+                    .map(r => r.time);
+
+                    html += `<h3><span class="swatch" style ="background: ${colour}"></span>${colour}</h3>`;
+
+                    if (times.length === 0) {
+                        html += `<p>-</p>`;
+                    } else {
+                        html += `<p>${times.map(t => Math.round(t)).join(", ")} ms</p>`;
+                    }
+
+                    if (finished && times.length > 0) {
+                        const average = times.reduce((sum, t) => sum + t, 0) / times.length;
+                        html += `<p><strong>Average: ${Math.round(average)} ms</strong></p>`;
+                    }
+                }
+
+                resultsList.innerHTML = html;
+            }
+
             square.addEventListener("click", () => {
                 if (waiting || finished) return; // Added this so that clicks are ignored if scheduleNext has already been called so spam-clicking doesn't queue a bunch of changes.
 
@@ -156,11 +215,13 @@
                 } else {
                     const reactionTime = performance.now() - colourShownAt;
                     results.push({ colour: sequence[step-1], time: reactionTime });
+                    renderResults();
                     feedback.textContent = `Reaction Time: ${Math.round(reactionTime)} ms`;
                     pulse();
                 
-                    if (step === sequence.length) {
+                if (step === sequence.length) {
                     finished = true;
+                    renderResults();
                     square.style.backgroundColor = "dimgray";
                     message.textContent = "Thanks for taking Team Greggs' reaction time test!";
                     return;
@@ -169,6 +230,8 @@
 
                 scheduleNext();
             });
+
+            renderResults();
 
             </script>
     </body>
