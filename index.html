@@ -91,6 +91,21 @@
                 font-size: 1.25rem;
                 text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
             }
+
+            #export {
+                margin-top: 1.5rem;
+                padding: 0.5rem 1rem;
+                font: inherit;
+                border: 3px solid black;
+                background:white;
+                cursor: pointer;
+            }
+
+            #export:disabled {
+                opacity: 0.5;
+                cursor: not-allowed
+            }
+
         </style>
     </head>
     <body>
@@ -111,6 +126,7 @@
         <aside id="results">
             <h2>Results by Colour</h2>
             <div id="results-list"></div>
+            <button id="export" disabled>Export Results (CSV)</button>
         </aside>
 
         <script>
@@ -119,6 +135,7 @@
             const message = document.getElementById("message");
             const feedback = document.getElementById("feedback");
             const resultsList = document.getElementById("results-list");
+            const exportButton = document.getElementById("export");
             const REPEATS = 5;
             let waiting = false;
             let started = false;
@@ -205,6 +222,28 @@
                 resultsList.innerHTML = html;
             }
 
+            function exportCSV() {
+                const rows = [["Trial", "Colour", "Reaction Time (ms)"]];
+
+                results.forEach((r, i) => {
+                    rows.push([i+1, r.colour, r.time.toFixed(1)]);
+                });
+
+                const csv = rows.map(row => row.join(",")).join("\n");
+
+                const blob = new Blob([csv], { type: "text/csv" });
+                const url = URL.createObjectURL(blob);
+
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = "reaction-times.csv";
+                link.click();
+
+                URL.revokeObjectURL(url);
+            }
+
+            exportButton.addEventListener("click", exportCSV);
+
             square.addEventListener("click", () => {
                 if (waiting || finished) return; // Added this so that clicks are ignored if scheduleNext has already been called so spam-clicking doesn't queue a bunch of changes.
 
@@ -219,12 +258,13 @@
                     feedback.textContent = `Reaction Time: ${Math.round(reactionTime)} ms`;
                     pulse();
                 
-                if (step === sequence.length) {
-                    finished = true;
-                    renderResults();
-                    square.style.backgroundColor = "dimgray";
-                    message.textContent = "Thanks for taking Team Greggs' reaction time test!";
-                    return;
+                    if (step === sequence.length) {
+                        finished = true;
+                        renderResults();
+                        exportButton.disabled = false;
+                        square.style.backgroundColor = "dimgray";
+                        message.textContent = "Thanks for taking Team Greggs' reaction time test!";
+                        return;
                 }
             }
 
